@@ -1,19 +1,32 @@
-<style scoped></style>
 
 <template>
-    <div class="Column">
+    <div class="column">
         <h2>{{ column.title }}</h2>
-        <Card :quest="quest" v-for="quest in column.quests" :key="quest.id" />
+        <VueDraggable class="drag-zone" v-model="localQuests" group="quest" item-key="id" :animation="200" >
+            <div v-for="quest in localQuests" :key="quest.id">
+                <Card :quest="quest" @delete="deleteQuest" @update="updateQuest" :class="{
+                    'status-disponible': column.title === 'Disponible',
+                    'status-encours':    column.title === 'En Cours',
+                    'status-termine':    column.title === 'Terminé',
+                    'status-abandonne':  column.title === 'Abandonné'
+                    }" />
+            </div>
+        </VueDraggable>
     </div>
 </template>
 
 <style scoped>
 .column {
+  flex: 1;
   background: #e8d5a3;
   border: 2px solid #c9922a;
   padding: 1rem;
   border-radius: 4px;
-  min-width: 250px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .column h2 {
@@ -22,15 +35,65 @@
   font-size: 1.5rem;
   font: bold 1.5rem 'Arial', sans-serif;
 }
+.card {
+    margin-top: 1rem;
+}
+
+.drag-zone {
+    min-height: 100px; /* ← zone de drop toujours visible */
+    width: 100%;
+}
+
+.status-disponible { border-left: 5px solid #c9922a; }
+.status-encours    { border-left: 5px solid #1a3a6b; }
+.status-termine    { border-left: 5px solid #1a5c2a; }
+.status-abandonne  { border-left: 5px solid #8b1a1a; }
+
 </style>
 
 <script>
+import { VueDraggable } from 'vue-draggable-plus';
 import Card from './Card.vue'
 export default {
     props: ['column'],
+    emits: ['delete-quest', 'update-quest', 'update-quests'],
     components: {
-        Card
+        Card,
+        VueDraggable
     },
+    data() {
+        return {
+            localQuests: [...this.column.quests]
+        }
+    },
+    watch : {
+        'column.quests': {
+            handler(newQuests){
+                if (JSON.stringify(newQuests) !== JSON.stringify(this.localQuests)) {
+                    this.localQuests = [...newQuests]
+                }
+            },
+            deep: true
+        },
+        localQuests :  {
+            handler(newQuests) {
+            const newIds = newQuests.map(q => q.id).join(',')
+            const colIds = this.column.quests.map(q => q.id).join(',')
+            if (newIds !== colIds) {
+                this.$emit('update-quests', { columnId: this.column.id, quests: newQuests })
+            }
+            },
+            deep: true
+        }
+    },
+    methods: {
+        deleteQuest(questId) {
+            this.$emit('delete-quest', { columnId: this.column.id, questId });
+        },
+        updateQuest({ updatedQuest, questId }) {
+            this.$emit('update-quest', { columnId: this.column.id, updatedQuest, questId });
+        }
+    }
 }
 </script>
 
