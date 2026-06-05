@@ -1,15 +1,10 @@
 
 <template>
     <div class="column">
-        <h2>{{ column.title }}</h2>
+        <h2>{{ column.title }} <span class="count">({{ questCount }})</span></h2>
         <VueDraggable class="drag-zone" v-model="localQuests" group="quest" item-key="id" :animation="200" >
             <div v-for="quest in localQuests" :key="quest.id">
-                <Card :quest="quest" @delete="deleteQuest" @update="updateQuest" :class="{
-                    'status-disponible': column.title === 'Disponible',
-                    'status-encours':    column.title === 'En Cours',
-                    'status-termine':    column.title === 'Terminé',
-                    'status-abandonne':  column.title === 'Abandonné'
-                    }" />
+                <Card :quest="quest" @delete="deleteQuest" @update="updateQuest" />
             </div>
         </VueDraggable>
     </div>
@@ -18,22 +13,25 @@
 <style scoped>
 .column {
   flex: 1;
-  background: #e8d5a3;
+  /*background: #e8d5a3;
   border: 2px solid #c9922a;
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 4px;*/
   min-width: 0;
+  max-width: 25%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+  overflow: hidden;
 }
 
 .column h2 {
-  color: #2e1707;
+  color: #dd8f77;
   margin: 0 0 1rem;
   font-size: 1.5rem;
   font: bold 1.5rem 'Arial', sans-serif;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.8)
 }
 .card {
     margin-top: 1rem;
@@ -44,10 +42,11 @@
     width: 100%;
 }
 
-.status-disponible { border-left: 5px solid #c9922a; }
-.status-encours    { border-left: 5px solid #1a3a6b; }
-.status-termine    { border-left: 5px solid #1a5c2a; }
-.status-abandonne  { border-left: 5px solid #8b1a1a; }
+.count {
+    font-size: 0.9rem;
+    color: #6d4804;
+    font-weight: Bold;
+}
 
 </style>
 
@@ -92,6 +91,11 @@ export default {
         },
         updateQuest({ updatedQuest, questId }) {
             this.$emit('update-quest', { columnId: this.column.id, updatedQuest, questId });
+        }
+    },
+    computed : {
+        questCount() {
+            return this.localQuests.length;
         }
     }
 }
