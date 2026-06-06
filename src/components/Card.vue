@@ -11,6 +11,7 @@
     <div v-if="!isEditing">
       <h2>{{ quest.title }}</h2>
       <h3>{{ quest.description }}</h3>
+      <h3>Difficulté: {{ quest.difficulty }}</h3>
       <p v-if="quest.status === 'Terminé'">
         <img src="/badge.png" alt="Trophy" /> Quête Terminée! récompense : {{ quest.reward }}
       </p>
@@ -30,7 +31,11 @@
     </div>
     <div v-else class="edit-form">
       <input v-model="editedQuest.title" :placeholder="quest.title" />
-      <input v-model="editedQuest.description" :placeholder="quest.description || 'Description de la quête'" />
+      <input
+        v-model="editedQuest.description"
+        :placeholder="quest.description || 'Description de la quête'"
+      />
+      <input v-model="editedQuest.difficulty" :placeholder="quest.difficulty || 'Difficulté'" />
       <input v-model="editedQuest.reward" :placeholder="quest.reward || 'Récompense'" />
       <div class="edit-actions">
         <button @click="saveEdit" id="save-btn"><img src="/save.png" alt="Save" /></button>
@@ -63,6 +68,18 @@ export default {
       this.$emit('delete', this.quest.id)
     },
     saveEdit() {
+      if (!this.editedQuest.title) {
+        alert('Le titre de la quête est requis.')
+        return
+      }
+      if(this.editedQuest.difficulty!=='') {
+        const validDifficulties = ['SSS', 'SS', 'S', 'A', 'B', 'C','D']
+        if (!validDifficulties.includes(this.editedQuest.difficulty.toUpperCase())) {
+          alert('La difficulté doit être l\'une des suivantes : SSS, SS, S, A, B, C, D ou laissée vide.')
+          return
+        }
+        this.editedQuest.difficulty = this.editedQuest.difficulty.toUpperCase()
+      }
       this.$emit('update', { updatedQuest: { ...this.editedQuest }, questId: this.quest.id })
       this.isEditing = false
     },
@@ -71,6 +88,14 @@ export default {
 </script>
 
 <style scoped>
+
+@media (max-width: 768px) {
+  .card {
+    width: 100%;            /* ← pleine largeur sur mobile */
+    padding: 1.5rem 2rem;
+  }
+}
+
 .card {
   position: relative;
   background-image: url('/Cartes.png');
@@ -81,20 +106,27 @@ export default {
   width: 90%;
   min-height: 200px;
   word-break: break-word;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-4px) rotate(0.5deg); 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 .card h2 {
   color: #1a0a00;
   font-size: 1.2rem;
   text-align: center;
-  Text-shadow: 1px 1px 2px rgba(255,220,150,0.5);
+  text-shadow: 1px 1px 2px rgba(255, 220, 150, 0.5);
 }
 .card h3 {
-  color: #664913;
+  color: #422e07;
   margin: 0.5rem 0;
   font-size: 0.95rem;
   text-align: center;
-  Text-shadow: 1px 1px 2px rgba(255,220,150,0.5);
+  text-shadow: 1px 1px 2px rgba(255, 220, 150, 0.5);
 }
 
 .card p {
@@ -103,7 +135,7 @@ export default {
   text-align: center;
   font-size: 1rem;
   font-style: italic;
-  text-shadow: 1px 1px 2px rgba(255,220,150,0.5);
+  text-shadow: 1px 1px 2px rgba(255, 220, 150, 0.5);
 }
 
 #delete-btn {
@@ -174,7 +206,6 @@ export default {
   background: #a87820;
 }
 
-
 #edit-btn img,
 #delete-btn img,
 #save-btn img,
@@ -199,6 +230,7 @@ export default {
   right: 40px;
   width: 70px;
   height: 70px;
+  animation: pulse 2s infinite;
 }
 
 .sealT {
@@ -207,6 +239,7 @@ export default {
   right: 40px;
   width: 100px;
   height: 90px;
+  animation: pulse 2s infinite;
 }
 
 .sealA {
@@ -215,20 +248,25 @@ export default {
   right: 40px;
   width: 70px;
   height: 70px;
+  animation: pulse 2s infinite;
 }
 
 .card-actions {
-    display: flex;
-    justify-content: bottom;  /* ← centre les boutons */
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+  display: flex;
+  justify-content: bottom; /* ← centre les boutons */
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 .edit-actions {
-    display: flex;
-    justify-content: center;  /* ← centre les boutons */
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+  display: flex;
+  justify-content: center; /* ← centre les boutons */
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
-
+@keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
 </style>

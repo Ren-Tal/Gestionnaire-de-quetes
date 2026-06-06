@@ -22,9 +22,26 @@ export default {
     filteredColumns() {
       return this.Columns.map((col) => ({
         ...col,
-        quests: col.quests.filter((quest) =>
-          quest.title.toLowerCase().includes(this.searchQuery.toLowerCase()),
-        ),
+        quests: col.quests.filter((quest) => {
+          const query = this.searchQuery.toLowerCase()
+          switch (this.searchField) {
+            case 'titre':
+              return quest.title.toLowerCase().includes(query)
+            case 'description':
+              return quest.description.toLowerCase().includes(query)
+            case 'reward':
+              return quest.reward.toLowerCase().includes(query)
+            case 'difficulty':
+              return quest.difficulty.toLowerCase().includes(query)
+            default:
+              return (
+                quest.title.toLowerCase().includes(query) ||
+                quest.description.toLowerCase().includes(query) ||
+                quest.reward.toLowerCase().includes(query) ||
+                quest.difficulty.toLowerCase().includes(query)
+              )
+          }
+        }),
       }))
     },
   },
@@ -75,6 +92,7 @@ export default {
   },
   data() {
     return {
+      searchField: 'tout',
       searchQuery: '',
       counter: 5,
       showForm: false,
@@ -89,6 +107,7 @@ export default {
               description: "L'épée magique est cachée dans la forêt enchantée.",
               status: 'Disponible',
               reward: "500 pièces d'or",
+              Difficulty: 'A',
             },
             {
               id: 2,
@@ -96,6 +115,7 @@ export default {
               description: 'La princesse est retenue captive dans le château du dragon.',
               status: 'Disponible',
               reward: "1000 pièces d'or",
+              Difficulty: 'B',
             },
           ],
         },
@@ -109,6 +129,7 @@ export default {
               description: 'Défendre le château contre les attaques ennemies.',
               status: 'En Cours',
               reward: "1500 pièces d'or",
+              Difficulty: 'C',
             },
           ],
         },
@@ -122,6 +143,7 @@ export default {
               description: 'Le trésor est caché dans la grotte mystérieuse.',
               status: 'Terminé',
               reward: "2000 pièces d'or",
+              Difficulty: 'A',
             },
           ],
         },
@@ -135,6 +157,7 @@ export default {
               description: 'Explorer la forêt interdite à la recherche de secrets.',
               status: 'Abandonné',
               reward: "500 pièces d'or",
+              Difficulty: 'S',
             },
           ],
         },
@@ -161,6 +184,13 @@ export default {
 <template>
   <div class="board-container">
     <input v-model="searchQuery" placeholder="Rechercher une quête..." class="search-bar" />
+    <select v-model="searchField" class="search-field">
+      <option value="tout">Tout</option>
+      <option value="titre">Titre</option>
+      <option value="description">Description</option>
+      <option value="reward">Récompense</option>
+      <option value="difficulty">Difficulté</option>
+    </select>
     <div class="stats">
       <p>Total Quêtes: {{ totalQuests }}</p>
       <p>Quêtes Terminées: {{ completedQuests }}</p>
@@ -180,26 +210,70 @@ export default {
       <img src="/form.png" alt="Ajouter" />
     </button>
     <div class="modal-overlay" v-if="showForm" @click.self="showForm = false">
-      <div class="modal-content">
-        <Formu @add-quest="addQuest" @cancel="showForm = false" />
-      </div>
+      <Transition name="fade" appear>
+        <div class="modal-content">
+          <Formu @add-quest="addQuest" @cancel="showForm = false" />
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
 
 <style>
+@media (max-width: 768px) {
+  .board {
+    flex-direction: column !important; /* ← !important pour forcer */
+    gap: 1rem;
+    background-image: none;
+    background-color: rgba(20, 10, 5, 0.8);
+    padding: 0.5rem;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .column {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+  }
+
+  .stats {
+    position: static !important;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    background-image: none;
+    margin-top: 4rem;
+    font-size: 0.8rem;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .search-bar {
+    padding-top: 0.5rem;
+    width: 100%;
+  }
+
+  .board-container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0.5rem;
+  }
+  
+  .search-field {
+    padding: 0 0;
+  }
+}
+
 .board {
   display: flex;
   gap: 1rem;
   padding: 1rem;
   border-radius: 4px;
-  background-image: 
-    linear-gradient( 
-      to bottom,
-      transparent 50%,
-      rgba(20, 10, 5, 0.9) 90%,
-      rgb(20, 10, 5) 100%
-    ),
+  background-image:
+    linear-gradient(to bottom, transparent 50%, rgba(20, 10, 5, 0.9) 90%, rgb(20, 10, 5) 100%),
     url('/board.png');
   background-size: 101% 100%;
   background-position: center top;
@@ -231,26 +305,25 @@ export default {
   height: 180px;
   padding: 1rem 2rem;
 
-  position: absolute;   /* ← fixed au lieu de absolute */
+  position: absolute; /* ← fixed au lieu de absolute */
   top: 1rem;
   right: 1rem;
-  z-index: 50;       /* ← au dessus du reste mais sous le modal */
+  z-index: 50; /* ← au dessus du reste mais sous le modal */
 }
 
 .stats p {
   margin: 0;
-  text-shadow: 1px 1px 2px rgba(255,10,100,0.7);
+  text-shadow: 1px 1px 2px rgba(255, 10, 100, 0.7);
 }
 
 .search-bar {
   padding: 0.5rem 1rem;
-  border: 2px solid #745d32;
+  border: 1px solid #c9922a;
   border-radius: 4px;
-  background: #d6b263;
+  background: rgba(244, 228, 193, 0.8);
   color: #2e1707;
   font-size: 1rem;
-  margin-bottom: 3.5rem;
-  margin-top: -1.5rem;
+  margin-top: -4.5rem;
   display: block;
   width: 300px;
 }
@@ -292,11 +365,33 @@ export default {
 }
 
 .modal-content {
-  background: #f9e5b6;
-  border: 2px solid #c9922a;
-  border-radius: 8px;
   padding: 1rem;
   min-width: 320px;
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: scale(0.8) translateY(-30px); /* ← arrive du haut en grandissant */
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: scale(0.8) translateY(-30px); /* ← repart vers le haut en rétrécissant */
+}
+
+.search-field {
+  padding: 0.5rem 1rem;
+  border: 2px solid #c9922a;
+  border-radius: 4px;
+  background: #f4e4c1;
+  color: #2e1707;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
 </style>
