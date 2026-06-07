@@ -5,6 +5,7 @@
     <input v-model="newQuest.description" placeholder="Description de la quête" />
     <input v-model="newQuest.difficulty" placeholder="Difficulté" />
     <input v-model="newQuest.reward" placeholder="Récompense" required />
+    <input v-model="newQuest.tagsInput" placeholder="Tags (séparés par des virgules)" />
     <select v-model="newQuest.status">
       <option value="Disponible">Disponible</option>
       <option value="En Cours">En Cours</option>
@@ -28,6 +29,7 @@ export default {
         description: '',
         difficulty: '',
         reward: '',
+        tagsInput: '',
         status: 'Disponible',
       },
     }
@@ -46,12 +48,16 @@ export default {
         }
         this.newQuest.difficulty = this.newQuest.difficulty.toUpperCase()
       }
+      if (this.newQuest.tagsInput) {
+        this.newQuest.tags = this.newQuest.tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+      }
       this.$emit('add-quest', { ...this.newQuest })
       this.newQuest = {
         title: '',
         description: '',
         difficulty: '',
         reward: '',
+        tagsInput: '',
         status: 'Disponible',
       }
     },

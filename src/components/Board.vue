@@ -33,12 +33,15 @@ export default {
               return quest.reward.toLowerCase().includes(query)
             case 'difficulty':
               return quest.difficulty.toLowerCase().includes(query)
+            case 'tags':
+              return quest.tags && quest.tags.some(tag => tag.toLowerCase().includes(query))
             default:
               return (
                 quest.title.toLowerCase().includes(query) ||
                 quest.description.toLowerCase().includes(query) ||
                 quest.reward.toLowerCase().includes(query) ||
-                quest.difficulty.toLowerCase().includes(query)
+                quest.difficulty.toLowerCase().includes(query) ||
+                (quest.tags && quest.tags.some(tag => tag.toLowerCase().includes(query)))
               )
           }
         }),
@@ -85,6 +88,11 @@ export default {
             alert('Une quête avec ce titre existe déjà dans cette colonne.')
             return
           }
+          if (updatedQuest.tagsInput) {
+            updatedQuest.tags = updatedQuest.tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+          } else {
+            updatedQuest.tags = []
+          }
           column.quests[questIndex] = { ...updatedQuest }
         }
       }
@@ -107,7 +115,8 @@ export default {
               description: "L'épée magique est cachée dans la forêt enchantée.",
               status: 'Disponible',
               reward: "500 pièces d'or",
-              Difficulty: 'A',
+              difficulty: 'A',
+              tags: ['épée', 'forêt', 'magique']
             },
             {
               id: 2,
@@ -115,7 +124,8 @@ export default {
               description: 'La princesse est retenue captive dans le château du dragon.',
               status: 'Disponible',
               reward: "1000 pièces d'or",
-              Difficulty: 'B',
+              difficulty: 'B',
+              tags: ['sauvetage', 'château', 'dragon']
             },
           ],
         },
@@ -129,7 +139,8 @@ export default {
               description: 'Défendre le château contre les attaques ennemies.',
               status: 'En Cours',
               reward: "1500 pièces d'or",
-              Difficulty: 'C',
+              difficulty: 'C',
+              tags: ['défense', 'château', 'ennemis']
             },
           ],
         },
@@ -143,7 +154,8 @@ export default {
               description: 'Le trésor est caché dans la grotte mystérieuse.',
               status: 'Terminé',
               reward: "2000 pièces d'or",
-              Difficulty: 'A',
+              difficulty: 'A',
+              tags: ['trésor', 'grotte', 'mystère']
             },
           ],
         },
@@ -157,7 +169,8 @@ export default {
               description: 'Explorer la forêt interdite à la recherche de secrets.',
               status: 'Abandonné',
               reward: "500 pièces d'or",
-              Difficulty: 'S',
+              difficulty: 'S',
+              tags: ['exploration', 'forêt', 'secret']
             },
           ],
         },
@@ -167,7 +180,15 @@ export default {
   created() {
     const saved = localStorage.getItem('columns')
     if (saved) {
-      this.Columns = JSON.parse(saved)
+        const parsed = JSON.parse(saved)
+        // Ajoute difficulty si elle manque
+        parsed.forEach(col => {
+            col.quests.forEach(quest => {
+                if (!quest.difficulty) quest.difficulty = '' // ← valeur par défaut
+                if (!quest.tags) quest.tags = [] // ← valeur par défaut
+            })
+        })
+        this.Columns = parsed
     }
   },
   watch: {
@@ -190,6 +211,7 @@ export default {
       <option value="description">Description</option>
       <option value="reward">Récompense</option>
       <option value="difficulty">Difficulté</option>
+      <option value="tags">Tags</option>
     </select>
     <div class="stats">
       <p>Total Quêtes: {{ totalQuests }}</p>
@@ -223,6 +245,8 @@ export default {
 @media (max-width: 768px) {
   .board {
     flex-direction: column !important; /* ← !important pour forcer */
+    width: 100% !important;
+    height: auto !important;
     gap: 1rem;
     background-image: none;
     background-color: rgba(20, 10, 5, 0.8);
@@ -242,7 +266,7 @@ export default {
     position: static !important;
     top: 0;
     right: 0;
-    width: 100%;
+    width: 99% !important;
     height: auto;
     background-image: none;
     margin-top: 4rem;
@@ -261,7 +285,7 @@ export default {
     flex-direction: column;
     padding-top: 0.5rem;
   }
-  
+
   .search-field {
     padding: 0 0;
   }

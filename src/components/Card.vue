@@ -11,7 +11,7 @@
     <div v-if="!isEditing">
       <h2>{{ quest.title }}</h2>
       <h3>{{ quest.description }}</h3>
-      <h3>Difficulté: {{ quest.difficulty }}</h3>
+      <h3 v-bind="quest.difficulty!==''" >Difficulté: {{ quest.difficulty }}</h3>
       <p v-if="quest.status === 'Terminé'">
         <img src="/badge.png" alt="Trophy" /> Quête Terminée! récompense : {{ quest.reward }}
       </p>
@@ -21,6 +21,11 @@
       <p v-if="quest.status === 'Abandonné'">
         🕳️ Quête Abandonnée! récompense perdue : {{ quest.reward }}
       </p>
+      <div class="tags" v-if="quest.tags && quest.tags.length">
+        <span v-for="tag in quest.tags" :key="tag" class="tag">
+          #{{ tag }}
+        </span>
+      </div>
       <div class="card-actions">
         <button @click="startEdit" id="edit-btn"><img src="/edit.png" alt="Edit" /></button>
         <button @click="deleteCard" id="delete-btn"><img src="/effacer.png" alt="Delete" /></button>
@@ -37,6 +42,7 @@
       />
       <input v-model="editedQuest.difficulty" :placeholder="quest.difficulty || 'Difficulté'" />
       <input v-model="editedQuest.reward" :placeholder="quest.reward || 'Récompense'" />
+      <input v-model="editedQuest.tagsInput" :placeholder="quest.tags ? quest.tags.join(', ') : 'Tags (séparés par des virgules)'" />
       <div class="edit-actions">
         <button @click="saveEdit" id="save-btn"><img src="/save.png" alt="Save" /></button>
         <button @click="cancelEdit" id="cancel-btn"><img src="/effacer.png" alt="Cancel" /></button>
@@ -268,5 +274,23 @@ export default {
     0%   { transform: scale(1); }
     50%  { transform: scale(1.08); }
     100% { transform: scale(1); }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  background: rgba(174, 42, 201, 0.616);
+  color: #2b1403;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  border:2px solid #6d21ac;
+  font-style: italic;
 }
 </style>
