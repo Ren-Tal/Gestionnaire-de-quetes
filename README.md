@@ -20,7 +20,7 @@ Etant moi-même adepte du monde des RPG, j'ai choisis ce theme non seulement par
 
 ## Démarche de développement
 Pour ce projet, j'ai choisi la démarche suivante :
- - **Etape 1:** - La carte statique
+ - **Etape 1:** La carte statique
  - **Etape 2:** Le developpement des colonnes et de la Board en utilisant les cartes
  - **Etape 3:** l'implementation des props et des emit qui permettent le transfert d'information d'une composante a une autre
  - **Etape 4:** Le formulaire qui permet d'ajouter des cartes + l'edition des cartes deja presentes
