@@ -20,13 +20,13 @@ Etant moi-même adepte du monde des RPG, j'ai choisis ce theme non seulement par
 
 ## Démarche de développement
 Pour ce projet, j'ai choisi la démarche suivante :
- - Etape 1 -- La carte statique
- - Etape 2 -- Le developpement des colonnes et de la Board en utilisant les cartes
- - Etape 3 -- l'implementation des props et des emit qui permettent le transfert d'information d'une composante a une autre
- - Etape 4 -- Le formulaire qui permet d'ajouter des cartes + l'edition des cartes deja presentes
- - Etape 5 -- L'ajout des v-if et computed pour l'affichage ainsi que les statistiques et la recherche filtrée
- - Etape 6 -- Persistance avec le localStorage
- - Bonus -- finir les differents bonus et de finir le designe de tout le site (sachant que ce point je l'ai un peu fait au fur et a mesure du travail)
+ - **Etape 1:** - La carte statique
+ - **Etape 2:** Le developpement des colonnes et de la Board en utilisant les cartes
+ - **Etape 3:** l'implementation des props et des emit qui permettent le transfert d'information d'une composante a une autre
+ - **Etape 4:** Le formulaire qui permet d'ajouter des cartes + l'edition des cartes deja presentes
+ - **Etape 5:** L'ajout des v-if et computed pour l'affichage ainsi que les statistiques et la recherche filtrée
+ - **Etape 6:** Persistance avec le localStorage
+ - **Bonus:** finir les differents bonus et de finir le designe de tout le site (sachant que ce point je l'ai un peu fait au fur et a mesure du travail)
 
 ### 1. Partir du statique pour comprendre la structure
 J'ai commencé par codé une carte statique dans `Card.vue`. Il s'agissait juste de commencé avec une interface pour avoir une idée sur la taille des cartes et le differents contenu de celle-ci avant de commencer a faire un peu la structure de `Column.vue` et de `Board.vue`.
