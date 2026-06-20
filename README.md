@@ -1,4 +1,4 @@
-# 🗡️ Board of Quests
+# Board of Quests
 
 ## Description du projet
 
